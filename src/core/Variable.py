@@ -2,6 +2,10 @@ import numpy as np
 
 class Variable:
   def __init__(self, data):
+    if data is not None:
+      if not isinstance(data, np.ndarray):
+        raise TypeError('\033[31m' + '{}은(는) 지원하지 않습니다.'.format(type(data)) + '\033[0m')
+
     self.data = data # 데이터
     self.grad = None # 기울기
     self.creator = None # 부모 함수
