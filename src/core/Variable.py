@@ -20,8 +20,17 @@ class Variable:
     funcs = [self.creator]
     while funcs:
       f = funcs.pop() # 함수 획득
-      x, y = f.input, f.output # 함수 입출력 획득
-      x.grad = f.backward(y.grad) # 역전파 진행
+      gys = [output.grad for output in f.outputs] # 미분값 획득
+      gxs = f.backward(*gys) # 역전파 호출
+      if not isinstance(gxs, tuple):
+        gxs = (gxs,)
 
-      if x.creator is not None:
-        funcs.append(x.creator)
+      for x, gx in zip(f.inputs, gxs):
+        # 역전파 결과 저장
+        if x.grad is None:
+          x.grad = gx
+        else:
+          x.grad = x.grad + gx
+
+        if x.creator is not None:
+          funcs.append(x.creator)
