@@ -1,15 +1,42 @@
 import numpy as np
 
 class Variable:
-  def __init__(self, data):
+  __array_priority__ = 200 # 인스턴스 연산자 우선순위 부여
+
+  def __init__(self, data, name=None):
     if data is not None:
       if not isinstance(data, np.ndarray):
         raise TypeError('\033[31m' + '{}은(는) 지원하지 않습니다.'.format(type(data)) + '\033[0m')
 
+    self.name = name # 이름
     self.data = data # 데이터
     self.grad = None # 기울기
     self.creator = None # 부모 함수
     self.generation = 0 # 세대 수
+
+  @property
+  def shape(self):
+    return self.data.shape
+  
+  @property
+  def ndim(self):
+    return self.data.ndim
+  
+  @property
+  def size(self):
+    return self.data.size
+  
+  @property
+  def dtype(self):
+    return self.data.dtype
+  
+  def __len__(self):
+    return len(self.data)
+  
+  def __repr__(self):
+    if self.data is None:
+      return 'None'
+    return str(self.data)
 
   def set_creator(self, func):
     self.creator = func
@@ -54,3 +81,17 @@ class Variable:
       if not retain_grad:
         for y in f.outputs:
           y().grad = None # 중간 미분값 삭제
+
+def setup_variable():
+  from Aria.core.Math import add, sub, rsub, mul, div, rdiv, neg, pow
+
+  Variable.__add__ = add
+  Variable.__radd__ = add
+  Variable.__sub__ = sub
+  Variable.__rsub__ = rsub
+  Variable.__mul__ = mul
+  Variable.__rmul__ = mul
+  Variable.__truediv__ = div
+  Variable.__rtruediv__ = rdiv
+  Variable.__neg__ = neg
+  Variable.__pow__ = pow

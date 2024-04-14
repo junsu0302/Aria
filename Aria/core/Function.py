@@ -1,10 +1,12 @@
 import weakref
 
-from src.core.Utils import as_array
-from src.core.Variable import Variable
+from Aria.core.Utils import as_array, as_varialbe
+from Aria.core.Variable import Variable
 
 class Function:
   def __call__(self, *inputs):
+    inputs = [as_varialbe(x) for x in inputs] # 입력값 형변환
+
     xs = [x.data for x in inputs] # 데이터 로드
     ys = self.forward(*xs) # 순전파 계산
     if not isinstance(ys, tuple):
