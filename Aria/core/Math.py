@@ -35,7 +35,7 @@ class Mul(Function):
     return x0 * x1
   
   def backward(self, gy):
-    x0, x1 = self.inputs[0].data, self.inputs[1].data
+    x0, x1 = self.inputs
     return gy * x1, gy * x0
 
 def mul(x0, x1):
@@ -47,7 +47,7 @@ class Div(Function):
     return x0 / x1
   
   def backward(self, gy):
-    x0, x1 = self.inputs[0].data, self.inputs[1].data
+    x0, x1 = self.inputs
     gx0 = gy / x1
     gx1 = gy * (-x0 / x1 ** 2)
     return gx0, gx1
@@ -78,7 +78,7 @@ class Pow(Function):
     return x ** self.c
   
   def backward(self, gy):
-    x = self.inputs[0].data
+    x, = self.inputs
     c = self.c
     return c * x ** (c-1) * gy
   
@@ -90,7 +90,7 @@ class Square(Function):
     return x ** 2
   
   def backward(self, gy):
-    x = self.inputs[0].data
+    x, = self.inputs
     return 2 * x * gy
   
 def square(x):
@@ -101,7 +101,7 @@ class Exp(Function):
     return np.exp(x)
   
   def backward(self, gy):
-    x = self.inputs[0].data
+    x, = self.inputs
     return np.exp(x) * gy
   
 def exp(x):
