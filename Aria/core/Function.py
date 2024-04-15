@@ -2,6 +2,7 @@ import weakref
 
 from Aria.core.Utils import as_array, as_varialbe
 from Aria.core.Variable import Variable
+from Aria.core.Config import Config
 
 class Function:
   def __call__(self, *inputs):
@@ -13,11 +14,12 @@ class Function:
       ys = (ys,)
     outputs = [Variable(as_array(y)) for y in ys] # 계산 결과 형변환
 
-    self.generation = max([x.generation for x in inputs]) # 세대 설정
-    for output in outputs:
-      output.set_creator(self) # 부모 함수 설정
-    self.inputs = inputs # 입력 값 저장
-    self.outputs = [weakref.ref(output) for output in outputs] # 출력 값 저장
+    if Config.enable_backprop:
+      self.generation = max([x.generation for x in inputs]) # 세대 설정
+      for output in outputs:
+        output.set_creator(self) # 부모 함수 설정
+      self.inputs = inputs # 입력 값 저장
+      self.outputs = [weakref.ref(output) for output in outputs] # 출력 값 저장
     
     return outputs if len(outputs) > 1 else outputs[0]
   
