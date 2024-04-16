@@ -1,5 +1,7 @@
 import numpy as np
 
+import Aria
+
 from Aria.core.Config import using_config
 
 class Variable:
@@ -40,6 +42,21 @@ class Variable:
       return 'None'
     return str(self.data)
 
+  def reshape(self, *shape):
+    if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
+      shape = shape[0]
+    return Aria.functions.Tensor.reshape(self, shape)
+  
+  def transpose(self):
+    return Aria.functions.Tensor.transpose(self)
+  
+  @property
+  def T(self):
+    return Aria.functions.Tensor.transpose(self)
+  
+  def sum(self, axis=None, keepdims=False):
+    return Aria.functions.Tensor.sum(self, axis, keepdims)
+
   def set_creator(self, func):
     self.creator = func
     self.generation = func.generation + 1
@@ -48,6 +65,10 @@ class Variable:
     self.grad = None
 
   def backward(self, retain_grad=False, create_graph=False):
+    """
+    retain_grad : 중간 미분값 저장 모드
+    create_graph : 역전파 활성화 모드
+    """
     if self.grad is None:
       self.grad = Variable(np.ones_like(self.data))
 
