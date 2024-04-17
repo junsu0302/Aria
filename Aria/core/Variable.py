@@ -34,6 +34,21 @@ class Variable:
   def dtype(self):
     return self.data.dtype
   
+  def reshape(self, *shape):
+    if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
+      shape = shape[0]
+    return Aria.functions.Tensor.reshape(self, shape)
+  
+  def transpose(self):
+    return Aria.functions.Tensor.transpose(self)
+  
+  @property
+  def T(self):
+    return Aria.functions.Tensor.transpose(self)
+  
+  def sum(self, axis=None, keepdims=False):
+    return Aria.functions.Tensor.sum(self, axis, keepdims)
+  
   def __len__(self):
     return len(self.data)
   
@@ -109,6 +124,7 @@ class Variable:
 
 def setup_variable():
   from Aria.core.Math import add, sub, rsub, mul, div, rdiv, neg, pow
+  from Aria.functions.Tensor import matmul
 
   Variable.__add__ = add
   Variable.__radd__ = add
@@ -120,3 +136,6 @@ def setup_variable():
   Variable.__rtruediv__ = rdiv
   Variable.__neg__ = neg
   Variable.__pow__ = pow
+
+  Variable.matmaul = matmul
+  Variable.dot = matmul
