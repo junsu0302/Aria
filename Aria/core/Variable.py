@@ -124,7 +124,8 @@ class Variable:
 
 def setup_variable():
   from Aria.core.Math import add, sub, rsub, mul, div, rdiv, neg, pow
-  from Aria.functions.Tensor import matmul
+  from Aria.functions.Tensor import matmul, max, min
+  from Aria.core.Utils import get_item
 
   Variable.__add__ = add
   Variable.__radd__ = add
@@ -139,3 +140,7 @@ def setup_variable():
 
   Variable.matmaul = matmul
   Variable.dot = matmul
+  Variable.max = max
+  Variable.min = min
+
+  Variable.__getitem__ = get_item

@@ -1,18 +1,19 @@
 import weakref
 
-from Aria.core.Utils import as_array, as_varialbe
+import Aria
+
 from Aria.core.Variable import Variable
 from Aria.core.Config import Config
 
 class Function:
   def __call__(self, *inputs):
-    inputs = [as_varialbe(x) for x in inputs] # 입력값 형변환
+    inputs = [Aria.core.Utils.as_varialbe(x) for x in inputs] # 입력값 형변환
 
     xs = [x.data for x in inputs] # 데이터 로드
     ys = self.forward(*xs) # 순전파 계산
     if not isinstance(ys, tuple):
       ys = (ys,)
-    outputs = [Variable(as_array(y)) for y in ys] # 계산 결과 형변환
+    outputs = [Variable(Aria.core.Utils.as_array(y)) for y in ys] # 계산 결과 형변환
 
     if Config.enable_backprop:
       self.generation = max([x.generation for x in inputs]) # 세대 설정

@@ -127,6 +127,15 @@ class Exp(Function):
 def exp(x):
   return Exp()(x)
 
+def logsumexp(x, axis=1):
+  m = x.max(axis=axis, keepdims=True)
+  y = x - m
+  np.exp(y, out=y)
+  s = y.sum(axis=axis, keepdims=True)
+  np.log(s, out=s)
+  m += s
+  return m
+
 #! 수치 미분
 def numerical_diff(f, x, eps=1e-4):
   x0 = Variable(x.data - eps)
