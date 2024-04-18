@@ -1,15 +1,22 @@
 import numpy as np
 
+import Aria
+
 from Aria.core.Function import Function
 from Aria.core.Variable import Variable
 from Aria.core.Utils import as_array
 
 class Add(Function):
   def forward(self, x0, x1):
+    self.x0_shape, self.x1_shape = x0.shape, x1.shape
     return x0 + x1
   
   def backward(self, gy):
-    return gy, gy
+    gx0, gx1 = gy, gy
+    if self.x0_shape != self.x1_shape:
+      gx0 = Aria.functions.Tensor.sum_to(gx0, self.x0_shape)
+      gx1 = Aria.functions.Tensor.sum_to(gx1, self.x1_shape)
+    return gx0, gx1
   
 def add(x0, x1):
   x1 = as_array(x1)
@@ -17,10 +24,15 @@ def add(x0, x1):
 
 class Sub(Function):
   def forward(self, x0, x1):
+    self.x0_shape, self.x1_shape = x0.shape, x1.shape
     return x0 - x1
   
   def backward(self, gy):
-    return gy, -gy
+    gx0, gx1 = gy, -gy
+    if self.x0_shape != self.x1_shape:
+      gx0 = Aria.functions.Tensor.sum_to(gx0, self.x0_shape)
+      gx1 = Aria.functions.Tensor.sum_to(gx1, self.x1_shape)
+    return gx0, gx1
   
 def sub(x0, x1):
   x1 = as_array(x1)
@@ -32,11 +44,16 @@ def rsub(x0, x1):
 
 class Mul(Function):
   def forward(self, x0, x1):
+    self.x0_shape, self.x1_shape = x0.shape, x1.shape
     return x0 * x1
   
   def backward(self, gy):
     x0, x1 = self.inputs
-    return gy * x1, gy * x0
+    gx0, gx1 = gy * x1, gy * x0
+    if self.x0_shape != self.x1_shape:
+      gx0 = Aria.functions.Tensor.sum_to(gx0, self.x0_shape)
+      gx1 = Aria.functions.Tensor.sum_to(gx1, self.x1_shape)
+    return gx0, gx1
 
 def mul(x0, x1):
   x1 = as_array(x1)
@@ -44,12 +61,15 @@ def mul(x0, x1):
 
 class Div(Function):
   def forward(self, x0, x1):
+    self.x0_shape, self.x1_shape = x0.shape, x1.shape
     return x0 / x1
   
   def backward(self, gy):
     x0, x1 = self.inputs
-    gx0 = gy / x1
-    gx1 = gy * (-x0 / x1 ** 2)
+    gx0, gx1 = gy / x1, gy * (-x0 / x1 ** 2)
+    if self.x0_shape != self.x1_shape:
+      gx0 = Aria.functions.Tensor.sum_to(gx0, self.x0_shape)
+      gx1 = Aria.functions.Tensor.sum_to(gx1, self.x1_shape)
     return gx0, gx1
   
 def div(x0, x1):
@@ -101,11 +121,20 @@ class Exp(Function):
     return np.exp(x)
   
   def backward(self, gy):
-    x, = self.inputs
-    return np.exp(x) * gy
+    y = self.outputs[0]()
+    return gy * y
   
 def exp(x):
   return Exp()(x)
+
+def logsumexp(x, axis=1):
+  m = x.max(axis=axis, keepdims=True)
+  y = x - m
+  np.exp(y, out=y)
+  s = y.sum(axis=axis, keepdims=True)
+  np.log(s, out=s)
+  m += s
+  return m
 
 #! 수치 미분
 def numerical_diff(f, x, eps=1e-4):
