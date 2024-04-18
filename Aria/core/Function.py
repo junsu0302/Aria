@@ -7,7 +7,7 @@ from Aria.core.Config import Config
 
 class Function:
   def __call__(self, *inputs):
-    inputs = [Aria.core.Utils.as_varialbe(x) for x in inputs] # 입력값 형변환
+    inputs = [Aria.core.Utils.as_variable(x) for x in inputs] # 입력값 형변환
 
     xs = [x.data for x in inputs] # 데이터 로드
     ys = self.forward(*xs) # 순전파 계산

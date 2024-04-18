@@ -9,7 +9,7 @@ def as_array(x):
     return np.array(x)
   return x
 
-def as_varialbe(obj):
+def as_variable(obj):
   from Aria.core.Variable import Variable
   
   if isinstance(obj, Variable):

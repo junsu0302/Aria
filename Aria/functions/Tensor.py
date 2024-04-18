@@ -1,7 +1,7 @@
 import numpy as np
 
 from Aria.core.Function import Function
-from Aria.core.Utils import as_varialbe
+from Aria.core.Utils import as_variable
 
 import Aria.functions.utils.Transform as Utils
 
@@ -18,7 +18,7 @@ class Reshape(Function):
   
 def reshape(x, shape):
   if x.shape == shape:
-    return as_varialbe(x)
+    return as_variable(x)
   return Reshape(shape)(x)
 
 class Transpose(Function):
@@ -60,7 +60,7 @@ class BroadcastTo(Function):
   
 def broadcast_to(x, shape):
   if x.shape == shape:
-    return as_varialbe(x)
+    return as_variable(x)
   return BroadcastTo(shape)(x)
 
 class SumTo(Function):
@@ -76,7 +76,7 @@ class SumTo(Function):
   
 def sum_to(x, shape):
   if x.shape == shape:
-    return as_varialbe(x)
+    return as_variable(x)
   return SumTo(shape)(x)
 
 class MatMul(Function):

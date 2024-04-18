@@ -3,10 +3,10 @@ import numpy as np
 class Dataset:
   def __init__(self, train=True, transform=None, target_transform=None):
     self.train = train
-    self.transform = transform # 입력 데이터셋 전처리
+    self.transform = transform # 입력 데이터 전처리
     if self.transform is None:
       self.transform = lambda x: x
-    self.target_transform = target_transform # 레이블 전처리
+    self.target_transform = target_transform # 입력 데이터 레이블 전처리
     if self.target_transform is None:
       self.target_transform = lambda x: x
 

@@ -1,13 +1,8 @@
-from Aria.layer import Layer
+from Aria.core.Model import Model
 from Aria.utils.Visualize import plot_dot_graph
 
-import Aria.layer as L
-from Aria.activation import sigmoid
-
-class Model(Layer):
-  def plot(self, *inputs, to_file='model.png'): # 모델 구조 이미지 반환
-    y = self.forward(*inputs)
-    return plot_dot_graph(y, verbose=True, to_file=to_file)
+import Aria.layers as L
+import Aria.activation as AF
   
 class TwoLayerNet(Model):
   def __init__(self, hidden_size, out_size):
@@ -16,12 +11,12 @@ class TwoLayerNet(Model):
     self.l2 = L.Linear(out_size)
 
   def forward(self, x):
-    y = sigmoid(self.l1(x))
+    y = AF.sigmoid(self.l1(x))
     y = self.l2(y)
     return y
   
 class MLP(Model):
-  def __init__(self, fc_output_sizes, activation=sigmoid):
+  def __init__(self, fc_output_sizes, activation=AF.sigmoid):
     super().__init__()
     self.activation = activation
     self.layers = []
