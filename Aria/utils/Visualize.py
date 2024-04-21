@@ -54,7 +54,7 @@ def get_dot_graph(output, verbose=True): # 계산 그래프 -> DOT
 def plot_dot_graph(output, verbose=True, to_file='graph.png'): # 이미지 및 DOT 파일 생성
   dot_graph = get_dot_graph(output, verbose)
 
-  target_dir = os.getcwd() + '/' + 'Aria/assets'
+  target_dir = os.getcwd() + '/' + 'Aria/assets/models'
   if not os.path.exists(target_dir):
     os.makedirs(target_dir)
   graph_path = os.path.join(target_dir, 'tmp_graph.dot')
