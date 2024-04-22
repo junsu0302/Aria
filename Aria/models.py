@@ -97,3 +97,17 @@ class VGG16(Model):
     image -= np.array([103.939, 116.779, 123.68], dtype=dtype)
     image = image.transpose((2, 0, 1))
     return image
+  
+class SimpleRNN(Model):
+  def __init__(self, hidden_size, out_size):
+    super().__init__()
+    self.rnn = L.RNN(hidden_size)
+    self.fc = L.Linear(out_size)
+
+  def reset_state(self):
+    self.rnn.reset_state()
+    
+  def forward(self, x):
+    h = self.rnn(x)
+    y = self.fc(h)
+    return y

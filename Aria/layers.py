@@ -5,6 +5,7 @@ from Aria.core.Parameter import Parameter
 
 from Aria.functions.Convolutional import conv2d
 from Aria.functions.Tensor import linear
+from Aria.functions.Basic import tanh
 
 from Aria.functions.utils.Convolutional import pair
 
@@ -69,3 +70,21 @@ class Conv2d(Layer):
       self._init_W(x)
 
     return conv2d(x, self.W, self.b, self.stride, self.pad)
+  
+class RNN(Layer):
+  def __init__(self, hidden_size, in_size=None):
+    super().__init__()
+    self.x2h = Linear(hidden_size, in_size=in_size) # 입력에서 은닉 상태로 변환하는 완전연결계층
+    self.h2h = Linear(hidden_size, in_size=in_size, nobias=True) # 이전 은닉 상태에서 다음 은닉 상태로 변환하는 완전연결계층
+    self.h = None # 은닉 상태 유무
+
+  def reset_state(self):
+    self.h = None
+
+  def forward(self, x):
+    if self.h is None:
+      h_new = tanh(self.x2h(x))
+    else:
+      h_new = tanh(self.x2h(x) + self.h2h(self.h))
+    self.h = h_new
+    return h_new

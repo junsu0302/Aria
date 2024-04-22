@@ -69,6 +69,9 @@ class Variable:
   def cleargrad(self):
     self.grad = None
 
+  def unchain(self):
+    self.creator = None
+
   def backward(self, retain_grad=False, create_graph=False):
     """
     retain_grad : 중간 미분값 저장 모드
@@ -111,6 +114,16 @@ class Variable:
         if not retain_grad:
           for y in f.outputs:
             y().grad = None # 중간 미분값 삭제
+
+  def unchain_backward(self):
+    if self.creator is not None:
+      funcs = [self.creator]
+      while funcs:
+        f = funcs.pop()
+        for x in f.inputs:
+          if x.creator is not None:
+            funcs.append(x.creator)
+            x.unchain()
 
 def setup_variable():
   from Aria.core.Math import add, sub, rsub, mul, div, rdiv, neg, pow
