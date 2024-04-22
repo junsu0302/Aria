@@ -39,8 +39,13 @@ class Variable:
       shape = shape[0]
     return Aria.functions.Tensor.reshape(self, shape)
   
-  def transpose(self):
-    return Aria.functions.Tensor.transpose(self)
+  def transpose(self, *axes):
+    if len(axes) == 0:
+      axes = None
+    elif len(axes) == 1:
+      if isinstance(axes[0], (tuple, list)) or axes[0] is None:
+        axes = axes[0]
+    return Aria.functions.Tensor.transpose(self, axes)
   
   @property
   def T(self):
@@ -57,27 +62,15 @@ class Variable:
       return 'None'
     return str(self.data)
 
-  def reshape(self, *shape):
-    if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
-      shape = shape[0]
-    return Aria.functions.Tensor.reshape(self, shape)
-  
-  def transpose(self):
-    return Aria.functions.Tensor.transpose(self)
-  
-  @property
-  def T(self):
-    return Aria.functions.Tensor.transpose(self)
-  
-  def sum(self, axis=None, keepdims=False):
-    return Aria.functions.Tensor.sum(self, axis, keepdims)
-
   def set_creator(self, func):
     self.creator = func
     self.generation = func.generation + 1
 
   def cleargrad(self):
     self.grad = None
+
+  def unchain(self):
+    self.creator = None
 
   def backward(self, retain_grad=False, create_graph=False):
     """
@@ -121,6 +114,16 @@ class Variable:
         if not retain_grad:
           for y in f.outputs:
             y().grad = None # 중간 미분값 삭제
+
+  def unchain_backward(self):
+    if self.creator is not None:
+      funcs = [self.creator]
+      while funcs:
+        f = funcs.pop()
+        for x in f.inputs:
+          if x.creator is not None:
+            funcs.append(x.creator)
+            x.unchain()
 
 def setup_variable():
   from Aria.core.Math import add, sub, rsub, mul, div, rdiv, neg, pow

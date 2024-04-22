@@ -1,9 +1,15 @@
 import numpy as np
 
-import Aria.functions.Tensor as F
+import Aria.activation as AF
 
 from Aria.core.Layer import Layer
 from Aria.core.Parameter import Parameter
+
+from Aria.functions.Convolutional import conv2d
+from Aria.functions.Tensor import linear
+from Aria.functions.Basic import tanh
+
+from Aria.functions.utils.Convolutional import pair
 
 class Linear(Layer):
   def __init__(self, out_size, nobias=False, dtype=np.float32, in_size=None):
@@ -32,4 +38,96 @@ class Linear(Layer):
       self.in_size = x.shape[1]
       self._init_W()
 
-    return F.linear(x, self.W, self.b)
+    return linear(x, self.W, self.b)
+  
+class Conv2d(Layer):
+  def __init__(self, out_channels, kernel_size, stride=1, pad=0, nobias=False, dtype=np.float32, in_channels=None):
+    super().__init__()
+    self.in_channels = in_channels
+    self.out_channels = out_channels
+    self.kernel_size = kernel_size
+    self.stride = stride
+    self.pad = pad
+    self.dtype = dtype
+
+    self.W = Parameter(None, name='W')
+    if in_channels is not None:
+      self._init_W()
+
+    if nobias:
+      self.b = None
+    else:
+      self.b = Parameter(np.zeros(out_channels, dtype=dtype), name='b')
+    
+  def _init_W(self, xp):
+    C, OC = self.in_channels, self.out_channels
+    KH, KW = pair(self.kernel_size)
+    scale = np.sqrt(1 / (C * KH * KW))
+    W_data = xp.random.randn(OC, C, KH, KW).astype(self.dtype) * scale
+    self.W.data = W_data
+
+  def forward(self, x):
+    if self.W.data is None:
+      self.in_channels = x.shape[1]
+      self._init_W(x)
+
+    return conv2d(x, self.W, self.b, self.stride, self.pad)
+  
+class RNN(Layer):
+  def __init__(self, hidden_size, in_size=None):
+    super().__init__()
+    self.x2h = Linear(hidden_size, in_size=in_size) # 입력에서 은닉 상태로 변환하는 완전연결계층
+    self.h2h = Linear(hidden_size, in_size=in_size, nobias=True) # 이전 은닉 상태에서 다음 은닉 상태로 변환하는 완전연결계층
+    self.h = None # 은닉 상태 유무
+
+  def reset_state(self):
+    self.h = None
+
+  def forward(self, x):
+    if self.h is None:
+      h_new = tanh(self.x2h(x))
+    else:
+      h_new = tanh(self.x2h(x) + self.h2h(self.h))
+    self.h = h_new
+    return h_new
+  
+class LSTM(Layer):
+  def __init__(self, hidden_size, in_size=None):
+    super().__init__()
+
+    H, I = hidden_size, in_size
+    self.x2f = Linear(H, in_size=I)
+    self.x2i = Linear(H, in_size=I)
+    self.x2o = Linear(H, in_size=I)
+    self.x2u = Linear(H, in_size=I)
+    self.h2f = Linear(H, in_size=H, nobias=True)
+    self.h2i = Linear(H, in_size=H, nobias=True)
+    self.h2o = Linear(H, in_size=H, nobias=True)
+    self.h2u = Linear(H, in_size=H, nobias=True)
+    self.reset_state()
+
+  def reset_state(self):
+    self.h = None
+    self.c = None
+
+  def forward(self, x):
+    if self.h is None:
+      f = AF.sigmoid(self.x2f(x))
+      i = AF.sigmoid(self.x2i(x))
+      o = AF.sigmoid(self.x2o(x))
+      u = tanh(self.x2u(x))
+    else:
+      f = AF.sigmoid(self.x2f(x) + self.h2f(self.h))
+      i = AF.sigmoid(self.x2i(x) + self.h2i(self.h))
+      o = AF.sigmoid(self.x2o(x) + self.h2o(self.h))
+      u = tanh(self.x2u(x) + self.h2u(self.h))
+
+    if self.c is None:
+      c_new = (i * u)
+    else:
+      c_new = (f * self.c) + (i * u)
+
+    h_new = o * tanh(c_new)
+
+    self.h, self.c = h_new, c_new
+    return h_new

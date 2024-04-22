@@ -3,12 +3,13 @@ import random
 import numpy as np
 
 class DataLoader:
-  def __init__(self, dataset, batch_size, shuffle=True):
+  def __init__(self, dataset, batch_size, shuffle=True, gpu=False):
     self.dataset = dataset # 데이터셋
     self.batch_size = batch_size # 배치 크기
     self.shuffle = shuffle # 섞을지 여부
     self.data_size = len(dataset) # 데이터셋의 크기
     self.max_iter = math.ceil(self.data_size / batch_size) # 최대 반복 횟수
+    self.gpu = gpu # GPU 사용 여부
 
     self.reset()
 
@@ -38,3 +39,9 @@ class DataLoader:
   
   def next(self):
     return self.__next__()
+  
+  def to_cpu(self):
+    self.gpu = False
+
+  def to_gpu(self):
+    self.gpu = True
