@@ -13,6 +13,18 @@ class Sigmoid(Function):
 def sigmoid(x):
   return Sigmoid()(x)
 
+class ReLU(Function):
+  def forward(self, x):
+    return np.maximum(x, 0.0)
+
+  def backward(self, gy):
+    x, = self.inputs
+    mask = x.data > 0
+    return gy * mask
+
+def relu(x):
+  return ReLU()(x)
+
 class Softmax(Function):
   def __init__(self, axis=1):
     self.axis = axis
@@ -36,7 +48,6 @@ class Softmax(Function):
     sumdx = gx.sum(axis=self.axis, keepdims=True)
     gx -= y * sumdx
     return gx
-
 
 def softmax(x, axis=1):
   return Softmax(axis)(x)
