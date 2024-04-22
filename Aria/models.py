@@ -111,3 +111,17 @@ class SimpleRNN(Model):
     h = self.rnn(x)
     y = self.fc(h)
     return y
+  
+class SimpleLSTM(Model):
+  def __init__(self, hidden_size, out_size):
+    super().__init__()
+    self.rnn = L.LSTM(hidden_size)
+    self.fc = L.Linear(out_size)
+
+  def reset_state(self):
+    self.rnn.reset_state()
+
+  def __call__(self, x):
+    y = self.rnn(x)
+    y = self.fc(y)
+    return y
