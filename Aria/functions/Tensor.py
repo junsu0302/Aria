@@ -22,14 +22,22 @@ def reshape(x, shape):
   return Reshape(shape)(x)
 
 class Transpose(Function):
+  def __init__(self, axes=None):
+    self.axes = axes
+
   def forward(self, x):
-    return np.transpose(x)
+    return x.transpose(self.axes)
   
   def backward(self, gy):
-    return transpose(gy)
+    if self.axes is None:
+      return transpose(gy)
+    
+    axes_len = len(self.axes)
+    inv_axes = tuple(np.argsort([ax % axes_len for ax in self.axes]))
+    return transpose(gy, axes=inv_axes)
   
-def transpose(x):
-  return Transpose()(x)
+def transpose(x, axes=None):
+  return Transpose(axes)(x)
 
 class Sum(Function):
   def __init__(self, axis, keepdims):

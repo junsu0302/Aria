@@ -29,7 +29,6 @@ class Normalize:
       std = np.array(self.std, dtype=array.dtype).reshape(*rshape)
     return (array - mean) / std
 
-
 class Flatten:
   def __call__(self, array):
     return array.flatten()
