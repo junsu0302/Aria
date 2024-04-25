@@ -31,7 +31,6 @@ class Linear(Layer):
     I, O = self.in_size, self.out_size
     self.W.data =  np.random.randn(I, O).astype(self.dtype) * np.sqrt(1 / I)
   
-  
   def forward(self, x):
     # 데이터를 보내는 시점에서 가중치 초기화
     if self.W.data is None:
