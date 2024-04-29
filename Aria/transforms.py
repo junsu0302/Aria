@@ -1,11 +1,19 @@
 import numpy as np
 
 class Normalize:
-  def __init__(self, mean=0, std=1):
+  """주어진 배열 정규화"""
+  def __init__(self, mean:float=0, std:float=1) -> None:
+    """주어진 배열 정규화
+
+    Args:
+      mean (float, optional): 평균(기본값은 0)
+      std (float, optional): 표준편차(기본값은 1)
+    """
     self.mean = mean
     self.std = std
 
-  def __call__(self, array):
+  def __call__(self, array:np.ndarray) -> np.ndarray:
+    """주어진 배열을 정규화된 배열로 변환"""
     mean, std = self.mean, self.std
 
     if not np.isscalar(mean):
