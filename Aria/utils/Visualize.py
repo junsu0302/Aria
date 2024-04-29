@@ -1,7 +1,16 @@
 import os
 import subprocess
 
-def _dot_var(v, verbose=False): # Variable -> DOT
+def _dot_var(v, verbose:bool=False) -> str:
+  """Variable 객체를 DOT 형식으로 변환
+
+  Args:
+    v (Variable): 변환할 Variable 객체
+    verbose (bool, optional): 자세한 정보를 표시할지 여부(기본값은 False)
+      
+  Returns:
+    str: DOT 형식으로 변환된 문자열
+  """
   dot_var = '{} [label="{}", color=orange, style=filled]\n'
 
   name = '' if v.name is None else v.name
@@ -13,7 +22,15 @@ def _dot_var(v, verbose=False): # Variable -> DOT
   return dot_var.format(id(v), name)
 
 
-def _dot_func(f): # Function -> DOT
+def _dot_func(f) -> str:
+  """Function 객체를 DOT 형식으로 변환
+
+  Args:
+    f (Function): 변환할 Function 객체
+
+  Returns:
+    str: DOT 형식으로 변환된 문자열
+  """
   dot_func = '{} [label="{}", color=lightblue, style=filled, shape=box]\n'
   ret = dot_func.format(id(f), f.__class__.__name__)
 
@@ -25,7 +42,16 @@ def _dot_func(f): # Function -> DOT
   return ret
 
 
-def get_dot_graph(output, verbose=True): # 계산 그래프 -> DOT
+def get_dot_graph(output, verbose:bool=True) -> str:
+  """계산 그래프를 DOT 형식으로 변환
+
+  Args:
+    output (Variable): 출력 변수
+    verbose (bool, optional): 자세한 정보를 표시할지 여부(기본값은 True)
+
+  Returns:
+    str: DOT 형식으로 변환된 계산 그래프
+  """
   txt = ''
   funcs = []
   seen_set = set()
@@ -51,7 +77,14 @@ def get_dot_graph(output, verbose=True): # 계산 그래프 -> DOT
   return 'digraph g {\n' + txt + '}'
 
 
-def plot_dot_graph(output, verbose=True, to_file='graph.png'): # 이미지 및 DOT 파일 생성
+def plot_dot_graph(output, verbose:bool=True, to_file:str='graph.png') -> None:
+  """계산 그래프를 이미지로 표시하고 DOT 파일로 저장
+
+  Args:
+    output (Variable): 출력 변수
+    verbose (bool, optional): 자세한 정보를 표시할지 여부(기본값은 True)
+    to_file (str, optional): 저장할 파일 이름(기본값은 'graph.png')
+  """
   dot_graph = get_dot_graph(output, verbose)
 
   target_dir = os.getcwd() + '/' + 'Aria/assets/models'
