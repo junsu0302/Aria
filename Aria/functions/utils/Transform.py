@@ -1,4 +1,16 @@
-def sum_to(x, shape):
+from typing import Union
+import numpy as np
+
+def sum_to(x:np.ndarray, shape: tuple) -> np.ndarray:
+  """shape에 맞게 입력 배열 합산
+
+  Args:
+    x (np.ndarray): 합산할 배열
+    shape (tuple): 결과 배열의 모양
+
+  Returns:
+    np.ndarray: shape에 맞게 합산된 배열
+  """
   ndim = len(shape)
   lead = x.ndim - ndim
   lead_axis = tuple(range(lead))
@@ -10,7 +22,18 @@ def sum_to(x, shape):
   return y
 
 
-def reshape_sum_backward(gy, x_shape, axis, keepdims):
+def reshape_sum_backward(gy:np.ndarray, x_shape:tuple, axis:Union[int,tuple,None], keepdims:bool) -> np.ndarray:
+  """합산의 역전파를 위한 reshape 작업 수행
+
+  Args:
+    gy (np.ndarray): 출력 기울기
+    x_shape (tuple): 입력 배열의 모양
+    axis (int | tuple | None): 합산할 축
+    keepdims (bool): 축을 유지할지 결정하는 플래그
+
+  Returns:
+    np.ndarray: 재구성된 출력 기울기
+  """
   ndim = len(x_shape)
   tupled_axis = axis
   if axis is None:
@@ -29,7 +52,16 @@ def reshape_sum_backward(gy, x_shape, axis, keepdims):
   gy = gy.reshape(shape)  # reshape
   return gy
 
-def max_backward_shape(x, axis):
+def max_backward_shape(x:np.ndarray, axis:Union[int,tuple,None]) -> list:
+  """최댓값의 역전파를 위한 출력 모양 계산
+
+  Args:
+    x (np.ndarray): 입력 배열
+    axis (int | tuple | None]): 최댓값을 취할 축
+
+  Returns:
+    list: 최댓값의 역전파를 위한 출력 모양
+  """
   if axis is None:
     axis = range(x.ndim)
   elif isinstance(axis, int):
