@@ -27,10 +27,17 @@ class Normalize:
     return (array - mean) / std
   
 class Compose:
-  def __init__(self, transforms=[]):
+  """여러 변환기를 조합하여 하나의 변환기로 설정"""
+  def __init__(self, transforms:list=[]) -> None:
+    """여러 변환기를 조합하여 하나의 변환기로 설정
+
+    Args:
+      transforms (list, optional): 변환기 리스트(기본값은 [])
+    """
     self.transforms = transforms
 
   def __call__(self, img):
+    """주어진 변환기를 순처적으로 적용"""
     if not self.transforms:
       return img
     for t in self.transforms:
